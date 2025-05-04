@@ -1,28 +1,24 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.js");
-require('dotenv').config();
+require("dotenv").config();
 
 const userAuth = async (req, res, next) => {
   try {
     // Read token from req cookies
-    const { token } = req?.cookies;
-    const decodedToken = await jwt.verify(token, process.env.TOKEN_SECRET);
+    const token = req.cookies?.token;
+    if (!token) return res.status(401).json({ message: "Authentication required" });
 
     //validate the token & find the usser
-    const { _id } = decodedToken;
+    const { _id } = jwt.verify(token, process.env.TOKEN_SECRET);
     const user = await User.findById(_id);
-    if (!user) {
-      throw new Error(`User not found`);
-    }
+    if (!user) return res.status(401).json({ message: "Invalid token" });
 
     //attach the user info to req
-    req.user=user;
+    req.user = user;
     next();
   } catch (error) {
-    res.status(500).send(`Error in AUTH :` + error.message);
+    res.status(401).json({ message: "Authentication failed" });
   }
 };
 
-module.exports={
-    userAuth,
-}
+module.exports = { userAuth };
