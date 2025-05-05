@@ -8,7 +8,7 @@ const app = express();
 
 app.use(cors({
   origin: [
-    "http://localhost:5173",
+    process.env.CORS_ORIGIN,
     "https://dev-buddy-eta.vercel.app"
   ],
   credentials: true,
