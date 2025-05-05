@@ -78,8 +78,8 @@ authRouter.post("/logout", userAuth, async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "strict",
-      secure: false, // set to true in production when using HTTPS
+      sameSite: "none",
+      secure: process.env.NODE_ENV === "production", // set to true in production when using HTTPS
     });
     res.status(200).send("User logged out successfully");
   } catch (error) {
