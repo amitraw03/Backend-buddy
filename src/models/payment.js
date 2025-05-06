@@ -32,19 +32,12 @@ const paymentSchema = new Schema(
       required: true,
     },
     notes: {
-      firstname: {
-        type: String,
-      },
-      lastName: {
-        type: String,
-      },
-      membershipType: {
-        type: String,
-      },
+      type: Schema.Types.Mixed,
+      default: {},
     },
   },
   { timestamps: true }
 );
 
-const Payment = new mongoose.model("Payment", paymentSchema);
+const Payment = mongoose.model("Payment", paymentSchema);
 module.exports = Payment;
