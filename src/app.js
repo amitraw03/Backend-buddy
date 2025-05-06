@@ -20,12 +20,14 @@ const authRouter = require("./routes/auth.js");
 const profileRouter= require("./routes/profile.js");
 const requestRouter = require("./routes/requests.js");
 const userRouter = require("./routes/user.js");
+const paymentRouter = require("./routes/payment.js");
 
 
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/",userRouter);
+app.use("/",paymentRouter);
 
 // //  /delete to delete a user
 // app.delete("/delete", userAuth, async (req, res) => {
