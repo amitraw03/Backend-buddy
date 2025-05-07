@@ -1,5 +1,5 @@
 const express = require("express");
-// const bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 const { userAuth } = require("../middlewares/auth");
 const razorpayInstance = require("../utils/razorpay");
 const Payment = require("../models/payment");
@@ -65,12 +65,13 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
 });
 
 //Verification with real-time notifications
-paymentRouter.post("/payment/webhook",
+//Verification with real-time notifications
+paymentRouter.post("/payment/webhook",bodyParser.raw({ type: "application/json" }),
   async (req, res) => {
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
     try {
       console.log("webhook called");
-      const signature = req.get("X-Razorpay-Signature");
+      const signature = req.headers["x-razorpay-signature"];
       console.log("webhook Signature",signature);
 
       const isValid = validateWebhookSignature(
@@ -85,10 +86,10 @@ paymentRouter.post("/payment/webhook",
           .json({ success: false, message: "Invalid webhook signature" });
       }
       //specified checks & Valid so update paymnet status in D.B
-      // const webhookData = JSON.parse(.toString());
+      const webhookData = JSON.parse(req.body.toString());
 
-      // if (webhookData.event === "payment.captured") {
-        const paymentInfo = req.body.payload.payment.entity;
+      if (webhookData.event === "payment.captured") {
+        const paymentInfo = webhookData.payload.payment.entity;
 
         const payment = await Payment.findOne({
           orderId: paymentInfo.order_id,
@@ -103,10 +104,12 @@ paymentRouter.post("/payment/webhook",
         await payment.save();
 
         //marked the user premium
-        const user = await User.findOne({_id: payment.userId});
+        const user = await User.findById(payment.userId);
+        if (user) {
           user.isPremium = true;
           await user.save();
-      
+        }
+      }
       res.status(200).json({ success: true });
     } catch (error) {
       res
