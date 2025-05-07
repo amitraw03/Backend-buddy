@@ -46,6 +46,10 @@ const userSchema = new Schema(
       required:true,
       enum: ["male", "female", "other"],
     },
+    isPremium:{
+      type:Boolean,
+      default:false
+    },
     skills: {
       type: [String],
     },
