@@ -65,7 +65,6 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
 });
 
 //Verification with real-time notifications
-//Verification with real-time notifications
 paymentRouter.post("/payment/webhook",bodyParser.raw({ type: "application/json" }),
   async (req, res) => {
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
@@ -85,7 +84,7 @@ paymentRouter.post("/payment/webhook",bodyParser.raw({ type: "application/json" 
           .status(400)
           .json({ success: false, message: "Invalid webhook signature" });
       }
-      //specified checks & Valid so update paymnet status in D.B
+      //specified checks & Valid so update payment status in D.B
       const webhookData = JSON.parse(req.body.toString());
 
       if (webhookData.event === "payment.captured") {

@@ -29,13 +29,13 @@ userRouter.get("/user/requests-pending", userAuth, async (req, res) => {
 //API to get all connected connections of loggedInUser
 userRouter.get("/user/connections", userAuth, async (req, res) => {
   try {
-    const loggedInUser = req?.user._id;
+    const loggedInUserId = req?.user._id;
 
     //to fetch accepted connections
     const acceptedRequests = await ConnectionRequest.find({
       $or: [
-        { toUserId: loggedInUser._id, status: "accepted" },
-        { fromUserId: loggedInUser._id, status: "accepted" },
+        { toUserId: loggedInUserId, status: "accepted" },
+        { fromUserId: loggedInUserId, status: "accepted" },
       ],
     })
       .populate("fromUserId", USER_SAFE_DATA)
@@ -44,7 +44,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 
     //for more simplified and only requirede data
     const requiredData = acceptedRequests.map((row) => {
-      if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
+      if (row.fromUserId._id.toString() === loggedInUserId.toString()) {
         return row.toUserId;
       }
       return row.fromUserId;

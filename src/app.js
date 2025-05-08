@@ -2,13 +2,13 @@ const express = require("express");
 const cors = require("cors");
 require('dotenv').config();
 const { connectDB } = require("./config/database");
-const User = require("./models/user.js");
 const cookieParser = require("cookie-parser");
 const app = express();
+const http = require("http"); // required to built connection
 
 app.use(cors({
   origin: [
-    process.env.CORS_ORIGIN,
+     process.env.CORS_ORIGIN,
     "https://dev-buddy-eta.vercel.app"
   ],
   credentials: true,
@@ -21,6 +21,7 @@ const profileRouter= require("./routes/profile.js");
 const requestRouter = require("./routes/requests.js");
 const userRouter = require("./routes/user.js");
 const paymentRouter = require("./routes/payment.js");
+const initialiseSocket = require("./utils/socket.js");
 
 
 app.use("/",authRouter);
@@ -41,11 +42,14 @@ app.use("/",paymentRouter);
 //   }
 // });
 
+//server created with existing app server
+const server = http.createServer(app);
+initialiseSocket(server);
 
 connectDB()
   .then(() => {
     console.log(`DataBase connection stablished🔥`);
-    app.listen(process.env.PORT || 3000, () => {
+    server.listen(process.env.PORT || 3000, () => {
       console.log(`Server successfull listening on PORT:` + `3000`);
     });
   })
