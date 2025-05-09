@@ -4,6 +4,7 @@ const initialiseSocket = (server) => {
   const io = socket(server, {
     cors: {
       origin: [process.env.CORS_ORIGIN, "https://dev-buddy-eta.vercel.app"],
+      credentials: true,
     },
   });
 
