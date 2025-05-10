@@ -21,6 +21,7 @@ const profileRouter= require("./routes/profile.js");
 const requestRouter = require("./routes/requests.js");
 const userRouter = require("./routes/user.js");
 const paymentRouter = require("./routes/payment.js");
+const chatRouter = require("./routes/chats.js")
 const initialiseSocket = require("./utils/socket.js");
 
 
@@ -29,6 +30,7 @@ app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/",userRouter);
 app.use("/",paymentRouter);
+app.use("/", chatRouter);
 
 // //  /delete to delete a user
 // app.delete("/delete", userAuth, async (req, res) => {

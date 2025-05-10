@@ -1,4 +1,5 @@
 const socket = require("socket.io");
+const Chat = require("../models/chat");
 
 const initialiseSocket = (server) => {
   const io = socket(server, {
@@ -18,8 +19,31 @@ const initialiseSocket = (server) => {
     });
 
     // In your socket initialization file
-    socket.on("sendMessage", ({ currId, targetId, text }) => {
+    socket.on("sendMessage", async ({ currId, targetId, text }) => {
       const roomId = [currId, targetId].sort().join("_");
+      //before emit info, save msges into the D.B
+      try {
+        let chat = await Chat.findOne({
+          participants: { $all: [currId, targetId] },
+        });
+        // if chat already dont exist
+        if (!chat) {
+          chat = new Chat({
+            participants: [userId, targetId],
+            messages: [],
+          });
+        }
+        // logic for addon on existing ones
+        chat.messages.push({
+          senderId: currId,
+          text,
+          timestamp: new Date(),
+        });
+        await chat.save();
+      } catch (error) {
+        console.log(`Chat handler Error: ` + error);
+      }
+      //emit to everyone in room
       io.to(roomId).emit("messageReceived", {
         senderId: currId,
         text,
