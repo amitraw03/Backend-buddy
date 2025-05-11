@@ -3,6 +3,7 @@ const cors = require("cors");
 require('dotenv').config();
 const { connectDB } = require("./config/database");
 const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 const app = express();
 const http = require("http"); // required to built connection
 
@@ -13,8 +14,18 @@ app.use(cors({
   ],
   credentials: true,
 }));
-app.use(express.json()); // express middleware to parse json data into jsObj in server coming from client
-app.use(cookieParser()); // to read the cookie from req
+
+app.use(cookieParser());  //parse cookie from req
+
+// ─── EXCLUDE WEBHOOK FROM JSON PARSING ─────────────────────────────────
+app.use(
+  "/payment/webhook",
+  bodyParser.raw({ type: "application/json" })
+);
+
+// ─── PARSE JSON FOR EVERYTHING ELSE ────────────────────────────────────
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const authRouter = require("./routes/auth.js");
 const profileRouter= require("./routes/profile.js");
@@ -29,22 +40,10 @@ app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/",userRouter);
-app.use("/",paymentRouter);
+app.use("/payment",paymentRouter);
 app.use("/", chatRouter);
 
-// //  /delete to delete a user
-// app.delete("/delete", userAuth, async (req, res) => {
-//   const userId = req.body?.userId;
-//   try {
-//     // await User.findByIdAndDelete({_id: userId});
-//     await User.findByIdAndDelete(userId);
-//     res.send(`User deleted successfully!`);
-//   } catch (error) {
-//     res.status(404).send(`Something went wrong`);
-//   }
-// });
-
-//server created with existing app server
+//Socket server created with existing app server
 const server = http.createServer(app);
 initialiseSocket(server);
 

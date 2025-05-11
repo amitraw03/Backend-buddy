@@ -100,4 +100,15 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
   }
 });
 
+//user account deletion
+userRouter.delete("/user/delete", userAuth, async(req,res)=>{
+  try {
+    const loggedInUser = req?.user;
+    await User.deleteOne({_id: loggedInUser._id});
+    res.json({message: "User Deleted Successfully"});
+  } catch (error) {
+    res.status(400).json({message: error.message});
+  }
+})
+
 module.exports = userRouter;
