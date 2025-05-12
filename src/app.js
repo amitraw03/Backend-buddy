@@ -11,7 +11,7 @@ const isProd = process.env.NODE_ENV === "production";
 
 app.use(
   cors({
-    origin: isProd ? "https://your-frontend.com" : "http://localhost:3000",
+    origin: isProd ? "https://dev-buddy-eta.vercel.app" : "http://localhost:3000",
     credentials: true, // Allow credentials
   })
 );
