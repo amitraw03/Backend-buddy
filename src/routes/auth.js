@@ -4,6 +4,15 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const { userAuth } = require("../middlewares/auth");
 
+const isProd = process.env.NODE_ENV === "production";
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProd, // true in prod, false in dev
+  sameSite: isProd ? "none" : "lax", // "none" in prod, "lax" in dev
+  expires: new Date(Date.now() + 8 * 3600000),
+};
+
 authRouter.post("/signup", async (req, res) => {
   const { firstName, lastName, emailId, password,gender , photoUrl } = req?.body;
   try {
@@ -27,12 +36,7 @@ authRouter.post("/signup", async (req, res) => {
     const savedUser = await user.save();
     const token = await user.getJWT();
 
-    res.cookie("token", token, {
-      httpOnly: true, // Helps prevent XSS attacks
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      expires: new Date(Date.now() + 8 * 3600000), // 8 hours
-    });
+    res.cookie("token", token, cookieOptions);
     res.status(200).send(savedUser);
   } catch (error) {
     res.status(400).send(`Error occured:` + error.message);
@@ -61,13 +65,7 @@ authRouter.post("/login", async (req, res) => {
 
     const token = await user.getJWT();
 
-    res.cookie("token", token, {
-      httpOnly: true, // Helps prevent XSS attacks
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      expires: new Date(Date.now() + 8 * 3600000), // 8 hours
-    });
-
+    res.cookie("token", token, cookieOptions);
     res.status(200).send(user);
   } catch (error) {
     res.status(400).send("Login failed: " + error.message);

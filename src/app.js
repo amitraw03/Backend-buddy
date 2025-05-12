@@ -1,46 +1,43 @@
 const express = require("express");
 const cors = require("cors");
-require('dotenv').config();
+require("dotenv").config();
 const { connectDB } = require("./config/database");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const app = express();
 const http = require("http"); // required to built connection
 
-app.use(cors({
-  origin: [
-     process.env.CORS_ORIGIN,
-    "https://dev-buddy-eta.vercel.app"
-  ],
-  credentials: true,
-}));
+const isProd = process.env.NODE_ENV === "production";
 
-app.use(cookieParser());  //parse cookie from req
+app.use(
+  cors({
+    origin: isProd ? "https://your-frontend.com" : "http://localhost:3000",
+    credentials: true, // Allow credentials
+  })
+);
+
+app.use(cookieParser()); //parse cookie from req
 
 // ─── EXCLUDE WEBHOOK FROM JSON PARSING ─────────────────────────────────
-app.use(
-  "/payment/webhook",
-  bodyParser.raw({ type: "application/json" })
-);
+app.use("/payment/webhook", bodyParser.raw({ type: "application/json" }));
 
 // ─── PARSE JSON FOR EVERYTHING ELSE ────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const authRouter = require("./routes/auth.js");
-const profileRouter= require("./routes/profile.js");
+const profileRouter = require("./routes/profile.js");
 const requestRouter = require("./routes/requests.js");
 const userRouter = require("./routes/user.js");
 const paymentRouter = require("./routes/payment.js");
-const chatRouter = require("./routes/chats.js")
+const chatRouter = require("./routes/chats.js");
 const initialiseSocket = require("./utils/socket.js");
 
-
-app.use("/",authRouter);
-app.use("/",profileRouter);
-app.use("/",requestRouter);
-app.use("/",userRouter);
-app.use("/payment",paymentRouter);
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", userRouter);
+app.use("/payment", paymentRouter);
 app.use("/", chatRouter);
 
 //Socket server created with existing app server
