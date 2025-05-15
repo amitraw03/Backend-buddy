@@ -7,14 +7,15 @@ const bodyParser = require("body-parser");
 const app = express();
 const http = require("http"); // required to built connection
 
-// const isProd = process.env.NODE_ENV === "production";
+const allowedOrigins = [
+  "https://dev-buddy-eta.vercel.app",
+  "http://localhost:5173",           // for local dev
+];
 
-app.use(
-  cors({
-    origin: ["https://dev-buddy-eta.vercel.app" ,"http://localhost:5173"],
-    credentials: true, // Allow credentials
-  })
-);
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 
 app.use(cookieParser()); //parse cookie from req
 
