@@ -7,11 +7,11 @@ const bodyParser = require("body-parser");
 const app = express();
 const http = require("http"); // required to built connection
 
-const isProd = process.env.NODE_ENV === "production";
+// const isProd = process.env.NODE_ENV === "production";
 
 app.use(
   cors({
-    origin: isProd ? "https://dev-buddy-eta.vercel.app" : "http://localhost:3000",
+    origin: ["https://dev-buddy-eta.vercel.app" ,"http://localhost:5173"],
     credentials: true, // Allow credentials
   })
 );
